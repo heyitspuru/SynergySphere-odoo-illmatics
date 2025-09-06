@@ -6,6 +6,7 @@ import { GeistMono } from "geist/font/mono";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import SessionProviderWrapper from "@/components/session-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "SynergySphere",
@@ -36,6 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>
