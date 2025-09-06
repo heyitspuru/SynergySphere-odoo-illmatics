@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +22,16 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    // If user is authenticated, redirect to dashboard
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
+
   const features = [
     {
       icon: <Activity className="h-8 w-8 text-blue-600" />,
@@ -57,9 +70,14 @@ export default function LandingPage() {
               SynergySphere
             </span>
           </div>
-          <Link href="/dashboard">
-            <Button>Get Started</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/auth/login">
+              <Button variant="outline">Sign In</Button>
+            </Link>
+            <Link href="/auth/register">
+              <Button>Get Started</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -80,15 +98,17 @@ export default function LandingPage() {
             teams that want to achieve more together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard">
+            <Link href="/auth/register">
               <Button size="lg" className="text-lg px-8 py-3">
                 Start Collaborating
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Learn More
-            </Button>
+            <Link href="/auth/login">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                Sign In
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -137,7 +157,7 @@ export default function LandingPage() {
             Join thousands of teams already using SynergySphere to achieve
             better results together.
           </p>
-          <Link href="/dashboard">
+          <Link href="/auth/register">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
               Get Started Now
               <ArrowRight className="ml-2 h-5 w-5" />

@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
       assigneeId: assigneeId || null,
       priority: priority || "medium",
       dueDate: dueDate ? new Date(dueDate) : null,
-      createdById: user._id,
+      creatorId: user._id,
     });
 
     await task.save();

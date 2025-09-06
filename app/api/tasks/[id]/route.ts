@@ -29,7 +29,9 @@ export async function GET(
     // Get task and populate related data
     const task = await Task.findById(params.id)
       .populate("assigneeId", "name email avatar")
-      .populate("projectId", "name ownerId members");
+      .populate("projectId", "name ownerId members")
+      .populate("creatorId", "name email avatar")
+      .populate("comments.userId", "name email avatar");
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -70,7 +72,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, description, status, assigneeId, priority, dueDate } = body;
+    const { title, description, status, assigneeId, priority, dueDate, estimatedHours, actualHours } = body;
 
     await connectDB();
 
@@ -105,12 +107,16 @@ export async function PUT(
     if (priority) task.priority = priority;
     if (dueDate !== undefined)
       task.dueDate = dueDate ? new Date(dueDate) : null;
+    if (estimatedHours !== undefined) task.estimatedHours = estimatedHours || null;
+    if (actualHours !== undefined) task.actualHours = actualHours || null;
 
     await task.save();
 
     // Populate response
     await task.populate("assigneeId", "name email avatar");
     await task.populate("projectId", "name");
+    await task.populate("creatorId", "name email avatar");
+    await task.populate("comments.userId", "name email avatar");
 
     return NextResponse.json(task);
   } catch (error) {

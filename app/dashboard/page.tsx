@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import {
   Card,
   CardContent,
@@ -57,7 +57,6 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
@@ -69,15 +68,10 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-      return;
-    }
-
     if (status === "authenticated") {
       fetchDashboardData();
     }
-  }, [status, router]);
+  }, [status]);
 
   const fetchDashboardData = async () => {
     try {
@@ -145,42 +139,47 @@ export default function DashboardPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader className="pb-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                </CardContent>
-              </Card>
-            ))}
+      <DashboardLayout title="Dashboard">
+        <div className="container mx-auto p-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader className="pb-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
           </div>
-          <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-red-500">{error}</p>
-            <Button onClick={fetchDashboardData} className="mt-4">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardLayout title="Dashboard">
+        <div className="container mx-auto p-6">
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-red-500">{error}</p>
+              <Button onClick={fetchDashboardData} className="mt-4">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
+    <DashboardLayout title="Dashboard">
     <div className="container mx-auto p-6 space-y-8">
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -358,5 +357,6 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
+    </DashboardLayout>
   );
 }

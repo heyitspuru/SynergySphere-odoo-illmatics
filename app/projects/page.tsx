@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import {
   Card,
   CardContent,
@@ -52,7 +52,6 @@ interface Project {
 
 export default function ProjectsPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,15 +60,10 @@ export default function ProjectsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-      return;
-    }
-
     if (status === "authenticated") {
       fetchProjects();
     }
-  }, [status, router]);
+  }, [status]);
 
   useEffect(() => {
     filterProjects();
@@ -143,49 +137,54 @@ export default function ProjectsPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="h-8 bg-gray-200 animate-pulse rounded w-48"></div>
-            <div className="h-10 bg-gray-200 animate-pulse rounded w-32"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <DashboardLayout title="Projects">
+        <div className="container mx-auto p-6">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="h-8 bg-gray-200 animate-pulse rounded w-48"></div>
+              <div className="h-10 bg-gray-200 animate-pulse rounded w-32"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-8 bg-gray-200 rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-red-500">{error}</p>
-            <Button onClick={fetchProjects} className="mt-4">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardLayout title="Projects">
+        <div className="container mx-auto p-6">
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-red-500">{error}</p>
+              <Button onClick={fetchProjects} className="mt-4">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
+    <DashboardLayout title="Projects">
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -366,5 +365,6 @@ export default function ProjectsPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }
