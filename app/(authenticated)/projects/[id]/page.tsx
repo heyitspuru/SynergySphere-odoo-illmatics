@@ -24,9 +24,11 @@ import {
   Calendar,
   Edit,
   Loader2,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { DiscussionThread } from "@/components/synergysphere/discussion-thread";
 
 interface Project {
   _id: string;
@@ -311,9 +313,10 @@ export default function ProjectDetailPage() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="tasks" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
+          <TabsTrigger value="discussions">Discussions</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
 
@@ -418,6 +421,23 @@ export default function ProjectDetailPage() {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="discussions" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Project Discussions
+              </CardTitle>
+              <CardDescription>
+                Collaborate with your team through project discussions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <DiscussionThread projectId={projectId} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">

@@ -6,7 +6,7 @@ import User from "@/lib/models/User";
 import Project from "@/lib/models/Project";
 import Task from "@/lib/models/Task";
 
-// GET /api/users/team-members - Get team members data
+// GET /api/users/team-members - Get all database users (team members)
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,27 +23,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Find all projects where current user is owner or member
-    const userProjects = await Project.find({
-      $or: [
-        { ownerId: currentUser._id },
-        { "members.userId": currentUser._id },
-      ],
-    }).populate("members.userId", "name email avatar role");
+    // Get ALL users from the database
+    const allUsers = await User.find({}).select("name email avatar role");
 
-    // Get all unique team members from these projects
-    const teamMemberIds = new Set<string>();
+    // Get all projects to map memberships
+    const allProjects = await Project.find({}).populate(
+      "members.userId",
+      "name email avatar role"
+    );
+
+    // Build project memberships map for all users
     const projectMemberships = new Map<string, any[]>();
 
-    userProjects.forEach((project) => {
+    allProjects.forEach((project) => {
+      // Add project owner
+      const ownerId = project.ownerId.toString();
+      if (!projectMemberships.has(ownerId)) {
+        projectMemberships.set(ownerId, []);
+      }
+      projectMemberships.get(ownerId)!.push({
+        _id: project._id,
+        name: project.name,
+        role: "owner",
+      });
+
+      // Add project members
       project.members.forEach((member: any) => {
         const memberId = member.userId._id.toString();
-        teamMemberIds.add(memberId);
-
         if (!projectMemberships.has(memberId)) {
           projectMemberships.set(memberId, []);
         }
-
         projectMemberships.get(memberId)!.push({
           _id: project._id,
           name: project.name,
@@ -52,23 +61,15 @@ export async function GET(request: NextRequest) {
       });
     });
 
-    // Get task statistics for each team member
+    // Get task statistics for each user
     const teamMembers = [];
 
-    for (const memberId of teamMemberIds) {
-      const user = await User.findById(memberId);
-      if (!user) continue;
+    for (const user of allUsers) {
+      const userId = user._id.toString();
 
       const [assignedTasks, completedTasks] = await Promise.all([
-        Task.countDocuments({
-          assigneeId: memberId,
-          projectId: { $in: userProjects.map((p) => p._id) },
-        }),
-        Task.countDocuments({
-          assigneeId: memberId,
-          status: "done",
-          projectId: { $in: userProjects.map((p) => p._id) },
-        }),
+        Task.countDocuments({ assigneeId: userId }),
+        Task.countDocuments({ assigneeId: userId, status: "done" }),
       ]);
 
       teamMembers.push({
@@ -77,11 +78,14 @@ export async function GET(request: NextRequest) {
         email: user.email,
         avatar: user.avatar,
         role: user.role,
-        projects: projectMemberships.get(memberId) || [],
+        projects: projectMemberships.get(userId) || [],
         tasksAssigned: assignedTasks,
         tasksCompleted: completedTasks,
       });
     }
+
+    // Sort by name for better UX
+    teamMembers.sort((a, b) => a.name.localeCompare(b.name));
 
     return NextResponse.json(teamMembers);
   } catch (error) {

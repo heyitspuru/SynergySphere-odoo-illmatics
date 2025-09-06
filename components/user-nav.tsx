@@ -31,12 +31,14 @@ export function UserNav({ user }: UserNavProps) {
     try {
       await signOut({
         redirect: false,
-        callbackUrl: "/auth/login",
+        callbackUrl: "/",
       });
-      router.push("/auth/login");
+      router.push("/");
       router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
+      // Fallback - force redirect to landing page
+      window.location.href = "/";
     }
   };
 

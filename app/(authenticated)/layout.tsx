@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserNav } from "@/components/user-nav";
+import { NotificationCenter } from "@/components/synergysphere/notification-center";
 import { Button } from "@/components/ui/button";
 import {
   Home,
@@ -88,7 +89,11 @@ export default function AuthenticatedLayout({
           <div className="flex h-full flex-col">
             {/* Logo */}
             <div className="flex h-16 items-center border-b px-6">
-              <h1 className="text-xl font-bold">SynergySphere</h1>
+              <Link href="/dashboard">
+                <h1 className="text-xl font-bold hover:text-primary transition-colors cursor-pointer">
+                  SynergySphere
+                </h1>
+              </Link>
             </div>
 
             {/* Navigation */}
@@ -124,13 +129,16 @@ export default function AuthenticatedLayout({
             <div className="border-t p-4">
               <div className="flex items-center justify-between">
                 <ThemeToggle />
-                <UserNav
-                  user={{
-                    name: session.user.name || "User",
-                    email: session.user.email || "",
-                    image: session.user.image || "",
-                  }}
-                />
+                <div className="flex items-center gap-2">
+                  <NotificationCenter />
+                  <UserNav
+                    user={{
+                      name: session.user.name || "User",
+                      email: session.user.email || "",
+                      image: session.user.image || "",
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -147,9 +155,14 @@ export default function AuthenticatedLayout({
         {/* Top Header */}
         <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center justify-between px-4">
-            <h1 className="text-lg font-semibold">SynergySphere</h1>
+            <Link href="/dashboard">
+              <h1 className="text-lg font-semibold hover:text-primary transition-colors cursor-pointer">
+                SynergySphere
+              </h1>
+            </Link>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <NotificationCenter />
               <UserNav
                 user={{
                   name: session.user.name || "User",

@@ -37,8 +37,20 @@ interface UserProfile {
   bio: string;
   skills: string[];
   role: string;
+  location: string;
+  jobTitle: string;
+  company: string;
+  timezone: string;
   createdAt: string;
   updatedAt: string;
+  statistics: {
+    totalProjects: number;
+    ownedProjects: number;
+    memberProjects: number;
+    tasksAssigned: number;
+    tasksCompleted: number;
+    completionRate: number;
+  };
 }
 
 export default function ProfilePage() {
@@ -55,6 +67,10 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editSkills, setEditSkills] = useState("");
+  const [editLocation, setEditLocation] = useState("");
+  const [editJobTitle, setEditJobTitle] = useState("");
+  const [editCompany, setEditCompany] = useState("");
+  const [editTimezone, setEditTimezone] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -76,6 +92,10 @@ export default function ProfilePage() {
         setEditName(data.name);
         setEditBio(data.bio || "");
         setEditSkills(data.skills.join(", "));
+        setEditLocation(data.location || "");
+        setEditJobTitle(data.jobTitle || "");
+        setEditCompany(data.company || "");
+        setEditTimezone(data.timezone || "");
       } else {
         toast({
           title: "Error",
@@ -113,6 +133,10 @@ export default function ProfilePage() {
           name: editName.trim(),
           bio: editBio.trim(),
           skills: skillsArray,
+          location: editLocation.trim(),
+          jobTitle: editJobTitle.trim(),
+          company: editCompany.trim(),
+          timezone: editTimezone.trim(),
         }),
       });
 
@@ -150,6 +174,10 @@ export default function ProfilePage() {
       setEditName(profile.name);
       setEditBio(profile.bio || "");
       setEditSkills(profile.skills.join(", "));
+      setEditLocation(profile.location || "");
+      setEditJobTitle(profile.jobTitle || "");
+      setEditCompany(profile.company || "");
+      setEditTimezone(profile.timezone || "");
     }
     setEditing(false);
   };
@@ -272,6 +300,42 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="grid gap-2">
+                      <Label htmlFor="jobTitle">Job Title</Label>
+                      <Input
+                        id="jobTitle"
+                        value={editJobTitle}
+                        onChange={(e) => setEditJobTitle(e.target.value)}
+                        placeholder="e.g., Senior Developer, Product Manager"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="company">Company</Label>
+                      <Input
+                        id="company"
+                        value={editCompany}
+                        onChange={(e) => setEditCompany(e.target.value)}
+                        placeholder="Your current company"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="location">Location</Label>
+                      <Input
+                        id="location"
+                        value={editLocation}
+                        onChange={(e) => setEditLocation(e.target.value)}
+                        placeholder="e.g., San Francisco, CA"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="timezone">Timezone</Label>
+                      <Input
+                        id="timezone"
+                        value={editTimezone}
+                        onChange={(e) => setEditTimezone(e.target.value)}
+                        placeholder="e.g., PST, UTC+2, EST"
+                      />
+                    </div>
+                    <div className="grid gap-2">
                       <Label htmlFor="skills">Skills</Label>
                       <Input
                         id="skills"
@@ -297,6 +361,48 @@ export default function ProfilePage() {
                         Email Address
                       </Label>
                       <p>{profile.email}</p>
+                    </div>
+
+                    {profile.jobTitle && (
+                      <div className="grid gap-1">
+                        <Label className="text-sm font-medium">Job Title</Label>
+                        <p className="text-muted-foreground">
+                          {profile.jobTitle}
+                        </p>
+                      </div>
+                    )}
+
+                    {profile.company && (
+                      <div className="grid gap-1">
+                        <Label className="text-sm font-medium">Company</Label>
+                        <p className="text-muted-foreground">
+                          {profile.company}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="grid gap-1 sm:grid-cols-2">
+                      {profile.location && (
+                        <div className="grid gap-1">
+                          <Label className="text-sm font-medium">
+                            Location
+                          </Label>
+                          <p className="text-muted-foreground">
+                            {profile.location}
+                          </p>
+                        </div>
+                      )}
+
+                      {profile.timezone && (
+                        <div className="grid gap-1">
+                          <Label className="text-sm font-medium">
+                            Timezone
+                          </Label>
+                          <p className="text-muted-foreground">
+                            {profile.timezone}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {profile.bio && (
@@ -353,22 +459,86 @@ export default function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">-</div>
-                <div className="text-sm text-muted-foreground">Projects</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {profile.statistics?.totalProjects || 0}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Total Projects
+                </div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-green-600">-</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {profile.statistics?.tasksCompleted || 0}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   Tasks Completed
                 </div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">-</div>
-                <div className="text-sm text-muted-foreground">
-                  Contributions
+                <div className="text-2xl font-bold text-purple-600">
+                  {profile.statistics?.tasksAssigned || 0}
                 </div>
+                <div className="text-sm text-muted-foreground">
+                  Tasks Assigned
+                </div>
+              </div>
+              <div className="text-center p-4 border rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">
+                  {profile.statistics?.completionRate || 0}%
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Completion Rate
+                </div>
+              </div>
+            </div>
+
+            {/* Breakdown */}
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Project Breakdown</Label>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Owned Projects:</span>
+                    <span className="font-medium">
+                      {profile.statistics?.ownedProjects || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Member Projects:</span>
+                    <span className="font-medium">
+                      {profile.statistics?.memberProjects || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Task Performance</Label>
+                {profile.statistics?.tasksAssigned &&
+                profile.statistics.tasksAssigned > 0 ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Completion Rate:</span>
+                      <span className="font-medium">
+                        {profile.statistics.completionRate}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="bg-green-500 h-2 rounded-full transition-all"
+                        style={{
+                          width: `${profile.statistics.completionRate}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No tasks assigned yet
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
