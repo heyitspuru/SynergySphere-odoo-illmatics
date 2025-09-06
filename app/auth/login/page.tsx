@@ -39,12 +39,12 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid email or password");
-      } else {
-        // Get the session to ensure it's properly set
-        const session = await getSession();
-        if (session) {
+      } else if (result?.ok) {
+        // Force a small delay to ensure session is properly set
+        setTimeout(() => {
           router.push("/dashboard");
-        }
+          router.refresh();
+        }, 100);
       }
     } catch (error) {
       setError("An error occurred. Please try again.");

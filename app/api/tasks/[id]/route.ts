@@ -122,6 +122,70 @@ export async function PUT(
   }
 }
 
+// PATCH /api/tasks/[id] - Update task status or specific fields
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { status, assigneeId, priority, dueDate } = body;
+
+    await connectDB();
+
+    // Find user by email
+    const user = await User.findOne({ email: session.user.email });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Find task and check access through project
+    const task = await Task.findById(params.id).populate("projectId");
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    const project = task.projectId as any;
+    const hasAccess =
+      project.ownerId.toString() === user._id.toString() ||
+      project.members.some(
+        (member: any) => member.userId.toString() === user._id.toString()
+      );
+
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
+
+    // Update only the provided fields
+    const updateData: any = {};
+    if (status) updateData.status = status;
+    if (assigneeId !== undefined) updateData.assigneeId = assigneeId || null;
+    if (priority) updateData.priority = priority;
+    if (dueDate !== undefined)
+      updateData.dueDate = dueDate ? new Date(dueDate) : null;
+
+    const updatedTask = await Task.findByIdAndUpdate(params.id, updateData, {
+      new: true,
+    })
+      .populate("assigneeId", "name email avatar")
+      .populate("projectId", "name");
+
+    return NextResponse.json(updatedTask);
+  } catch (error) {
+    console.error("Task PATCH error:", error);
+    return NextResponse.json(
+      { error: "Failed to update task" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/tasks/[id] - Delete task
 export async function DELETE(
   request: NextRequest,

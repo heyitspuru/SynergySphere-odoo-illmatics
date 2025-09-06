@@ -9,6 +9,10 @@ export interface IUser extends mongoose.Document {
   avatar?: string;
   bio?: string;
   skills: string[];
+  location?: string;
+  jobTitle?: string;
+  company?: string;
+  timezone?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +50,22 @@ const UserSchema = new mongoose.Schema({
   skills: {
     type: [String],
     default: [],
+  },
+  location: {
+    type: String,
+    default: "",
+  },
+  jobTitle: {
+    type: String,
+    default: "",
+  },
+  company: {
+    type: String,
+    default: "",
+  },
+  timezone: {
+    type: String,
+    default: "",
   },
   createdAt: {
     type: Date,
