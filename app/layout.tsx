@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono";
 
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import SessionProviderWrapper from "@/components/session-provider";
 
 export const metadata = {
   title: "SynergySphere",
@@ -27,14 +28,16 @@ export default function RootLayout({
           GeistMono.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <SessionProviderWrapper>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
