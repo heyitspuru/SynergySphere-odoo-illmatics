@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="url(#avatar-gradient)"/>
+  
+  <!-- User silhouette -->
+  <path d="M100 105C117.673 105 132 90.6731 132 73C132 55.3269 117.673 41 100 41C82.3269 41 68 55.3269 68 73C68 90.6731 82.3269 105 100 105Z" fill="white"/>
+  <path d="M100 123C66.9167 123 40 149.917 40 183V200H160V183C160 149.917 133.083 123 100 123Z" fill="white"/>
+  
+  <!-- Subtle pattern -->
+  <circle cx="50" cy="50" r="8" fill="white" opacity="0.1"/>
+  <circle cx="150" cy="50" r="12" fill="white" opacity="0.1"/>
+  <circle cx="50" cy="150" r="10" fill="white" opacity="0.1"/>
+  <circle cx="150" cy="150" r="15" fill="white" opacity="0.1"/>
+  
+  <!-- Gradient -->
+  <defs>
+    <linearGradient id="avatar-gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+</svg> 
